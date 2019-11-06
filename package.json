@@ -9,15 +9,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/RobertoPita/graphql-learning.git"
+    "url": "https://github.com/betopita-code/graphql-learning.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/RobertoPita/graphql-learning/issues"
+    "url": "https://github.com/betopita-code/graphql-learning/issues"
   },
-  "homepage": "https://github.com/RobertoPita/graphql-learning#readme",
+  "homepage": "https://github.com/betopita-code/graphql-learning#readme",
   "devDependencies": {
     "nodemon": "^1.19.4"
   }
