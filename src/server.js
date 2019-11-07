@@ -41,7 +41,7 @@ const resolvers = {
         if(id !== item.id){
           return
         }
-        return item
+        return item.id
 
       })
 
