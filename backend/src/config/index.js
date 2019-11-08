@@ -6,7 +6,9 @@ import { execute, subscribe } from 'graphql'
 import { createServer } from 'http'
 import { SubscriptionServer } from 'subscriptions-transport-ws'
 import { schema } from '../graphql'
-import './env' // Environment Variables
+import dotenv from 'dotenv'
+
+dotenv.config()
 
 const app = express()
 
@@ -34,13 +36,13 @@ const options = {
   useNewUrlParser: true,
   useUnifiedTopology: true
 }
-
 mongo.connect(process.env.URI, options).then(() => {
+
   // If connected, then start server
 
   ws.listen(process.env.PORT, () => {
     console.log('Server on port', process.env.PORT)
-    console.log('Mongo on port: ', process.env.DBPORT)
+    console.log('Mongo on port: ', process.env.DB_PORT)
   
     // Set up the WebSocket for handling GraphQL subscriptions
     new SubscriptionServer({
