@@ -29,9 +29,10 @@ const options = {
   reconnectTries: Number.MAX_VALUE,
   reconnectInterval: 1000,
 
-  useNewUrlParser: true,
-  useFindAndModify: false,
   useCreateIndex: true,
+  useFindAndModify: false,
+  useNewUrlParser: true,
+  useUnifiedTopology: true
 }
 
 mongo.connect(process.env.URI, options).then(() => {

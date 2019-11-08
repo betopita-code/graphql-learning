@@ -6,8 +6,8 @@ process.env.SEED = process.env.SEED || 'No, I am your father' // Seed SECRET enc
 // Configuration MongoDB
 process.env.DBNAME = process.env.DBNAME || 'gql?retryWrites=true&w=majority'
 process.env.DBHOST = process.env.DBHOST || '@cluster0-zx8mm.mongodb.net'
-process.env.DBUSER = process.env.DBUSER || 'eac';
-process.env.DBPASS = process.env.DBPASS || 'rootadm1n'
+process.env.DBUSER = process.env.DBUSER || 'user';
+process.env.DBPASS = process.env.DBPASS || 'root@us3r'
 process.env.DBPORT = process.env.DBPORT || 27017
 
 // For development
