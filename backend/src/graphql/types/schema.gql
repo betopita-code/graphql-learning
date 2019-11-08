@@ -1,0 +1,16 @@
+scalar Upload
+scalar JSON
+scalar Date
+
+type Query {
+    # Empty field obligatory
+    _empty: String
+}
+
+type Mutation {
+    _empty: String
+}
+
+type Subscription {
+  _empty: String
+}
