@@ -10,7 +10,7 @@ let userSchema = new mongoose.Schema({
 
   updatedAt: { type: Date },
 
-  name: { type: String, required: [true, 'The name is required'] },
+  name: { type: String, unique: true, required: [true, 'The name is required'] },
 
   email: { type: String, unique: true, required: [true, 'The email is required'] },
 

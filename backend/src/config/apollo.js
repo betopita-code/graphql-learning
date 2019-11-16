@@ -11,7 +11,6 @@ export const server = new ApolloServer({
   schema,
 
   context({ req }) {
-    console.log('apollo<<req<<', req.user, req.role)
 
     return {
       models,

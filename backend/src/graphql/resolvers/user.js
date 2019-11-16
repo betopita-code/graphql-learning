@@ -33,6 +33,8 @@ export default {
         if(!User)
           throw new Error('user_not_found')
 
+        User.pw_login = 'hidden'
+
         return [{ ok: true, message: 'success', user: [ User ] }]
 
       } catch (e) { return [{ ok: false, message: e.message, data: e.name }] }
@@ -46,6 +48,8 @@ export default {
 
         if(!User)
           throw new Error('users_not_found')
+
+        User.map(item => item.pw_login = 'hidden')
 
         return [{ ok: true, message: 'success', user: User }]
 
@@ -74,7 +78,12 @@ export default {
         let newUser = new user(inputTrim)
 
         const User = await newUser.save()
-        
+
+        if(!User)
+          throw new Error('user_not_found')
+
+        User.pw_login = 'hidden'
+
         pubsub.publish('NEW_USER', { newUser })
 
         return [{ ok: true, message: 'success', user: [ User ] }]
@@ -116,6 +125,8 @@ export default {
         if(!User)
           throw new Error('user_not_found')
 
+        User.pw_login = 'hidden'
+
         return [{ ok: true, message: 'success', user: [ User ] }]
 
       } catch (e) { return [{ ok: false, message: e.message, data: e.name }] }
@@ -131,6 +142,8 @@ export default {
 
         if(!User)
           throw new Error('user_not_found')
+
+        User.pw_login = 'hidden'
 
         return [{ ok: true, message: 'success', user: [ User ] }]
 
