@@ -1,20 +1,12 @@
 import mongoose from 'mongoose'
 
-// let Schema = moongoose.Schema;
+let uploadSchema = new mongoose.Schema({
 
-let uploadSchema =  new mongoose.Schema({
-    filename: {
-        type: String,
-        required: [true, 'The filename is necessary']
-    },
-    mimetype: {
-        type: String,
-        required: [true, 'The mimetype is necessary']
-    },
-    path: {
-        type: String,
-        required: [true, 'The path is necessary']
-    }
+  filename: { type: String, required: [true, 'The filename is required'] },
+
+  mimetype: { type: String, required: [true, 'The mimetype is required'] },
+
+  path: { type: String, required: [true, 'The path is required'] }
 })
 
 export default mongoose.model('uploads', uploadSchema)

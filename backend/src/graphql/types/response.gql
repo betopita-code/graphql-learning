@@ -1,5 +1,5 @@
 type Response {
-    ok: Boolean!
-    message: String
-    data: JSON
+  ok: Boolean!
+  message: String
+  data: JSON
 }

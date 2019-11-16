@@ -1,11 +1,9 @@
-"""
-Returns the token for authentication, the name and role of the person
-"""
 type Login {
   ok: Boolean
   message: String
   token: String
 }
+
 extend type Mutation {
   login(email: String!, pw_login: String!): Login!
 }

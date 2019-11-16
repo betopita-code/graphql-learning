@@ -1,116 +1,140 @@
 import bcrypt from 'bcrypt'
-import { isAuth, ForbiddenError } from '../../config/errors/authentication'
+import { isAuth, isAdmin } from '../../config/errors/authentication'
 import { pubsub } from '../../config/apollo'
+import { trimmer } from '../../helper/trimObj'
+import convertTime from '../../helper/convertTime'
 
-
-// I export my querys and mutations to join with the other resolvers
 export default {
-    Subscription: {
-        newUser: {
-            subscribe: () => pubsub.asyncIterator('NEW_USER')
-        }
+
+  Subscription: {
+
+    newUser: { subscribe: () => pubsub.asyncIterator('NEW_USER') }
+  },
+
+  Query: {
+
+    readUser: isAuth.createResolver( async (root, { id, name }, { models: { user } }) => {
+
+      try {
+
+        const keys = [ 'id', 'name' ]
+
+        let inputTrim = trimmer({ id, name }, keys)
+
+        if(inputTrim.name)
+          inputTrim.name = inputTrim.name.toUpperCase()
+
+        let type
+        let User
+        
+        if(id ? type = { status: true, _id: inputTrim.id } : type = { status: true, name: inputTrim.name })
+          User = await user.findOne(type)
+
+        if(!User)
+          throw new Error('user_not_found')
+
+        return [{ ok: true, message: 'success', user: [ User ] }]
+
+      } catch (e) { return [{ ok: false, message: e.message, data: e.name }] }
+    }),
+
+    readUsers: isAuth.createResolver( async (root, { since = 0, limit = 10 }, { models: { user }, user_loged }) => {
+
+      try {
+
+        const User = await user.find().skip(since).limit(limit)
+
+        if(!User)
+          throw new Error('users_not_found')
+
+        return [{ ok: true, message: 'success', user: User }]
+
+      } catch (e) { return [{ ok: false, message: e.message, data: e.name }] }
+    }),
+  },
+
+  Mutation: {
+
+    createUser: async (root, { input }, { models: { user } }) => {
+
+      try {
+
+        const { pw_login, role } = input
+
+        const keys = [ 'name', 'email' ]
+
+        let inputTrim = trimmer(input, keys)
+
+        inputTrim.name = inputTrim.name.toUpperCase()
+        inputTrim.email = inputTrim.email.toLowerCase()
+        inputTrim.pw_login = bcrypt.hashSync(pw_login, 10)
+        inputTrim.role = role
+        inputTrim.status = true
+
+        let newUser = new user(inputTrim)
+
+        const User = await newUser.save()
+        
+        pubsub.publish('NEW_USER', { newUser })
+
+        return [{ ok: true, message: 'success', user: [ User ] }]
+
+      } catch (e) { return [{ ok: false, message: e.message, data: e.name }] }
     },
 
-    Query: {
-        /*
-            "isAuth" verifies that the user is logged in and 
-            that the token is valid, if it passes the validations 
-            then it executes the resolver that it contains inside
-        */
-        getUsers: isAuth.createResolver(
-            async (root, { since = 0, limit = 10 }, { models: { user } }) => {
-                try {
-                    return await user.find({ status: true }).skip(since).limit(limit);
-                } catch (err) {
-                    return { ok: false, message: err.message };
-                }
-            }
-        ),
+    updateUser: isAdmin.createResolver(async (root, { id, input }, { models: { user }, user_loged }) => {
 
-        getUser: isAuth.createResolver(
-            async (root, { id }, { models: { user } }) => {
-                try {
-                    return await user.findOne({ status: true, _id: id });
-        
-                } catch (err) { return { ok: false, message: err.message }; }
-            }
-        )
-    },
+      try {
 
-    Mutation: {
-        createUser: async (root, { input }, { models: { user } }) => {
+        id = id.trim()
 
-            let { name, email, pw_login, role } = input;
-        
-            try {
-                let newUser =  new user({
-                    name,
-                    email,
-                    pw_login: bcrypt.hashSync(pw_login, 10),
-                    role
-                })
-        
-                await newUser.save()
-        
-                // Active eventTrigger
-                pubsub.publish('NEW_USER', { newUser })
-        
-                return {
-                    ok: true,
-                    message: 'Created correctly'
-                }
-        
-            } catch (err) {
-                return {
-                    ok: false,
-                    message: err.message
-                }
-            }
-        },
+        let { pw_login, role, status } = input
 
-        updateUser: isAuth.createResolver(
-            async (root, { id, input }, { models: { user } }) => {
+        const keys = [ 'name', 'email', 'registration' ]
+
+        let inputTrim = trimmer(input, keys)
+
+        inputTrim.updatedAt = convertTime.dateNow(Date.now)
+
+        if(inputTrim.name)
+          inputTrim.name = inputTrim.name.toUpperCase()
+
+        if(inputTrim.email)
+          inputTrim.email = inputTrim.email.toLowerCase()
         
-                const { name, email, role } = input
+        if(pw_login)
+          inputTrim.pw_login = bcrypt.hashSync(pw_login, 10)
         
-                let query = { _id: id, status: true }
-                let update = { $set: { name, email, role } }
+        if(role)
+          inputTrim.role = role
         
-                let props = {
-                    new: true,
-                    runValidators: true,
-                    context: 'query'
-                }
-        
-                try {
-                    await user.findOneAndUpdate(query, update, props)
-                    return { ok: true, message: 'Updated successfully' }
-        
-                } catch (err) {
-                    return { ok: false, message: err.message }
-                }
-            }
-        ),
-        
-        deleteUser: isAuth.createResolver(
-            async (root, { id }, { user: { role }, models: { user } }) => {
-                // If the user does not have the permissions to create more users, we return an error
-                if (role !== 'ADMIN') throw new ForbiddenError()
-        
-                try {
-                    let query = { _id: id, status: true }
-                    let update = { $set: { status: false } }
-        
-                    let User = await user.findOneAndUpdate(query, update)
-        
-                    if (!User) return { ok: false, message: 'It was previously removed' }
-                    return { ok: true, message: 'Removed correctly' }
-        
-                } catch (err) {
-                    return { ok: false, message: "The id does not exist" }
-                }
-            }
-        )
-    }
-    
+        if(status)
+          inputTrim.status = status
+
+        const User = await user.findByIdAndUpdate({ _id: id }, inputTrim, { new: true, runValidators: true, context: 'query' } )
+
+        if(!User)
+          throw new Error('user_not_found')
+
+        return [{ ok: true, message: 'success', user: [ User ] }]
+
+      } catch (e) { return [{ ok: false, message: e.message, data: e.name }] }
+    }),
+
+    destroyUser: isAdmin.createResolver(async (root, { id }, { models: { user } }) => {
+
+      try {
+
+        id = id.trim()
+
+        const User = await user.findByIdAndRemove({ _id: id })
+
+        if(!User)
+          throw new Error('user_not_found')
+
+        return [{ ok: true, message: 'success', user: [ User ] }]
+
+      } catch (e) { return [{ ok: false, message: e.message, data: e.name }] }
+    })
+  }
 }

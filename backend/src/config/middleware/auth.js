@@ -1,33 +1,33 @@
 import jwt from 'jsonwebtoken'
 
 export const getToken = payload => {
-    let token = jwt.sign(payload, process.env.SEED, { expiresIn: process.env.EXPTOKEN })
-    return token
+
+  let token = jwt.sign(payload, process.env.SEED, { expiresIn: process.env.EXPTOKEN })
+
+  return token
 }
 
 export const checkToken = (req, res, next) => {
-    const token = req.headers["x-token"]
-    
-    if (token) {
-        try {
-            // Verificamos que el token sea valido
-            const { user, role } = jwt.verify(token, process.env.SEED)
 
-            // Si se verifico bien, entonces creamos un nuevo token con el mismo idUser
-            const newToken = getToken({ user, role })
+  const token = req.headers["x-token"]
 
-            // Agregamos a nuestros headers (backend) el id del usuario logeado
-            req.user = user
-            req.role = role
+  if (token) {
 
-            // Enviamos a los headers del cliente el nuevo token para que lo actualice
-            res.set("Access-Control-Expose-Headers", "x-token")
-            res.set("x-token", newToken);
+    try {
 
-        } catch (error) {
-            // Invalid Token
-        }
-    }
+      const { user_loged, role, name } = jwt.verify(token, process.env.SEED)
 
-    next()
+      const newToken = getToken({ user_loged, role })
+
+      req.user_loged = user_loged
+      req.role = role
+      req.name = name
+
+      res.set("Access-Control-Expose-Headers", "x-token")
+      res.set("x-token", newToken);
+
+    } catch (e) {}
+  }
+
+  next()
 }

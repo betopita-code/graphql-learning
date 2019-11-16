@@ -1,24 +1,35 @@
 import promisesAll from 'promises-all'
 
 export default {
-    Query: {
-        async getUploads(root, {}, { models: { uploads } }) {
-            try { return await uploads.find({}) } catch (err) { return err }
-        }
+
+  Query: {
+
+    async getUploads(root, { }, { models: { uploads } }) {
+
+      try {
+
+        return await uploads.find({})
+
+      } catch (e) { return e }
+    }
+  },
+
+  Mutation: {
+
+    singleUpload(obj, { file }, { utils: { processUpload } }) {
+
+      return processUpload(file)
+
     },
 
-    Mutation: {
-        singleUpload(obj, { file }, { utils: { processUpload } }) {
-            return processUpload(file);
-        },
+    async multipleUpload(obj, { files }, { utils: { processUpload } }) {
 
-        async multipleUpload(obj, { files }, { utils: { processUpload }  }) {
-            const { resolve, reject } = await promisesAll.all(files.map(processUpload))
+      const { resolve, reject } = await promisesAll.all(files.map(processUpload))
 
-            if (reject.length)
-                reject.forEach(({ name, message }) => console.error(`${name}: ${message}`))
+      if (reject.length)
+        reject.forEach(({ name, message }) => console.error(`${name}: ${message}`))
 
-            return resolve
-        }
+      return resolve
     }
+  }
 }

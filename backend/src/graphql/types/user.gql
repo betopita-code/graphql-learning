@@ -1,35 +1,50 @@
 enum Roles {
-    ADMIN
-    USER
+  ADMIN
+  USER
 }
 
-type User {
-    id: ID
-    name: String
-    email: String
-    pw_login: String
-    role: Roles
-    status: Boolean
+type user {
+  updatedAt: DateTime
+  id: ID
+  name: String
+  email: String
+  pw_login: String
+  role: Roles
+  status: Boolean
 }
 
-input UserInput {
-    name: String!
-    email: String!
-    pw_login: String
-    role: Roles!
+type userResponse {
+  ok: Boolean
+  message: String
+  user: [user]
+  data: JSON
+}
+
+input userCreate {
+  name: String!
+  email: String!
+  pw_login: String!
+  role: Roles!
+}
+
+input userUpdate {
+  name: String
+  email: String
+  pw_login: String
+  role: Roles
 }
 
 extend type Query {
-    getUsers(since: Int, limit: Int): [User]
-    getUser(id: ID): User
+  readUser(id: ID, name: String): [userResponse]
+  readUsers(since: Int, limit: Int): [userResponse]
 }
 
 extend type Mutation {
-    createUser(input: UserInput!): Response
-    updateUser(id: ID!, input: UserInput!): Response
-    deleteUser(id: ID!): Response
+  createUser(input: userCreate!): [userResponse]
+  updateUser(id: ID!, input: userUpdate!): [userResponse]
+  destroyUser(id: ID!): [userResponse]
 }
 
 extend type Subscription {
-    newUser: User!
+  newUser: user!
 }

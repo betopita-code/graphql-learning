@@ -6,39 +6,46 @@ import uploads from '../models/Uploads'
 
 const uploadDir = resolve(__dirname, '../../uploads')
 
-// Ensure upload directory exists.
 sync(uploadDir)
 
-const storeDB = async(file) => {
-    const { id, filename, mimetype, path } = file;
+const storeDB = async (file) => {
 
-    try {
-        let file = new uploads({ id, filename, mimetype, path });
-        return await file.save();
+  const { id, filename, mimetype, path } = file;
 
-    } catch (err) {
-        return err
-    }
+  try {
+
+    let file = new uploads({ id, filename, mimetype, path })
+
+    return await file.save();
+
+  } catch (e) { return e }
 }
 
 const storeFS = ({ stream, filename }) => {
-    const id = generate()
-    const path = `${uploadDir}/${id}-${filename}`
 
-    return new Promise((resolve, reject) =>
-        stream.on('error', error => {
-            if (stream.truncated) unlinkSync(path)
-            reject(error)
-        })
-        .pipe(createWriteStream(path))
-        .on('error', error => reject(error))
-        .on('finish', () => resolve({ id, path }))
-    )
+  const id = generate()
+
+  const path = `${uploadDir}/${id}-${filename}`
+
+  return new Promise((resolve, reject) =>
+    stream.on('error', error => {
+
+      if (stream.truncated) unlinkSync(path)
+      reject(error)
+    })
+      .pipe(createWriteStream(path))
+      .on('error', error => reject(error))
+      .on('finish', () => resolve({ id, path }))
+  )
 }
 
 export const processUpload = async upload => {
-    const { createReadStream, filename, mimetype } = await upload
-    const stream = createReadStream()
-    const { id, path } = await storeFS({ stream, filename })
-    return storeDB({ id, filename, mimetype, path })
+
+  const { createReadStream, filename, mimetype } = await upload
+
+  const stream = createReadStream()
+
+  const { id, path } = await storeFS({ stream, filename })
+
+  return storeDB({ id, filename, mimetype, path })
 }

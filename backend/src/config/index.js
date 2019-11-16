@@ -6,14 +6,12 @@ import { execute, subscribe } from 'graphql'
 import { createServer } from 'http'
 import { SubscriptionServer } from 'subscriptions-transport-ws'
 import { schema } from '../graphql'
-import dotenv from 'dotenv'
-
-dotenv.config()
+import 'dotenv/config'
 
 const app = express()
 
 app.use(checkToken) // Middleware for validate tokens
-server.applyMiddleware({ app, path: '/api' })
+server.applyMiddleware({ app, path: '/graphql' })
 
 // Create webSocketServer
 const ws = createServer(app)
