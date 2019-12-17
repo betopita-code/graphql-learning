@@ -1,9 +1,9 @@
 import { createError } from 'apollo-errors'
 import { baseResolver } from './baseResolver'
 
-export const ForbiddenError = createError('ForbiddenError', { message: 'You do not have permission to perform this action.' })
+export const ForbiddenError = createError('ForbiddenError', { message: 'Role error' })
 
-export const AuthenticationRequiredError = createError('AuthenticationRequiredError', { message: 'You must log in to do this' })
+export const AuthenticationRequiredError = createError('AuthenticationRequiredError', { message: 'Authentication error' })
 
 export const isAuth = baseResolver.createResolver( async (root, args, { models: { user }, user_loged: { user_loged_id } }, info) => {
 

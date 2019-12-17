@@ -14,7 +14,7 @@ export default {
         if (User && bcrypt.compareSync(pw_login, User.pw_login))
           return { ok: true, message: 'Authenticated', token: getToken({ user_loged: User.id, role: User.role, name: User.name }) }
 
-        return { ok: false, message: 'Incorrect email or pw_login' }
+        return { ok: false, message: 'Email or pw_login error' }
 
       } catch (e) { return { ok: false, message: e.message, data: e.name } }
     }

@@ -13,40 +13,40 @@ export default {
 
   Query: {
 
-    readUser: isAuth.createResolver( async (root, { id, name }, { models: { user } }) => {
+    readUser: isAuth.createResolver(async (root, { id, name }, { models: { user } }) => {
 
       try {
 
-        const keys = [ 'id', 'name' ]
+        const keys = ['id', 'name']
 
         let inputTrim = trimmer({ id, name }, keys)
 
-        if(inputTrim.name)
+        if (inputTrim.name)
           inputTrim.name = inputTrim.name.toUpperCase()
 
         let type
         let User
-        
-        if(id ? type = { status: true, _id: inputTrim.id } : type = { status: true, name: inputTrim.name })
+
+        if (id ? type = { status: true, _id: inputTrim.id } : type = { status: true, name: inputTrim.name })
           User = await user.findOne(type)
 
-        if(!User)
+        if (!User)
           throw new Error('user_not_found')
 
         User.pw_login = 'hidden'
 
-        return [{ ok: true, message: 'success', user: [ User ] }]
+        return [{ ok: true, message: 'success', user: [User] }]
 
       } catch (e) { return [{ ok: false, message: e.message, data: e.name }] }
     }),
 
-    readUsers: isAuth.createResolver( async (root, { since = 0, limit = 10 }, { models: { user }, user_loged }) => {
+    readUsers: isAuth.createResolver(async (root, { since = 0, limit = 10 }, { models: { user }, user_loged }) => {
 
       try {
 
         const User = await user.find().skip(since).limit(limit)
 
-        if(!User)
+        if (!User)
           throw new Error('users_not_found')
 
         User.map(item => item.pw_login = 'hidden')
@@ -65,7 +65,7 @@ export default {
 
         const { pw_login, role } = input
 
-        const keys = [ 'name', 'email' ]
+        const keys = ['name', 'email']
 
         let inputTrim = trimmer(input, keys)
 
@@ -79,14 +79,14 @@ export default {
 
         const User = await newUser.save()
 
-        if(!User)
+        if (!User)
           throw new Error('user_not_found')
 
         User.pw_login = 'hidden'
 
         pubsub.publish('NEW_USER', { newUser })
 
-        return [{ ok: true, message: 'success', user: [ User ] }]
+        return [{ ok: true, message: 'success', user: [User] }]
 
       } catch (e) { return [{ ok: false, message: e.message, data: e.name }] }
     },
@@ -99,35 +99,35 @@ export default {
 
         let { pw_login, role, status } = input
 
-        const keys = [ 'name', 'email', 'registration' ]
+        const keys = ['name', 'email']
 
         let inputTrim = trimmer(input, keys)
 
         inputTrim.updatedAt = convertTime.dateNow(Date.now)
 
-        if(inputTrim.name)
+        if (inputTrim.name)
           inputTrim.name = inputTrim.name.toUpperCase()
 
-        if(inputTrim.email)
+        if (inputTrim.email)
           inputTrim.email = inputTrim.email.toLowerCase()
-        
-        if(pw_login)
+
+        if (pw_login)
           inputTrim.pw_login = bcrypt.hashSync(pw_login, 10)
-        
-        if(role)
+
+        if (role)
           inputTrim.role = role
-        
-        if(status)
+
+        if (status)
           inputTrim.status = status
 
-        const User = await user.findByIdAndUpdate({ _id: id }, inputTrim, { new: true, runValidators: true, context: 'query' } )
+        const User = await user.findByIdAndUpdate({ _id: id }, inputTrim, { new: true, runValidators: true, context: 'query' })
 
-        if(!User)
+        if (!User)
           throw new Error('user_not_found')
 
         User.pw_login = 'hidden'
 
-        return [{ ok: true, message: 'success', user: [ User ] }]
+        return [{ ok: true, message: 'success', user: [User] }]
 
       } catch (e) { return [{ ok: false, message: e.message, data: e.name }] }
     }),
@@ -140,12 +140,12 @@ export default {
 
         const User = await user.findByIdAndRemove({ _id: id })
 
-        if(!User)
+        if (!User)
           throw new Error('user_not_found')
 
         User.pw_login = 'hidden'
 
-        return [{ ok: true, message: 'success', user: [ User ] }]
+        return [{ ok: true, message: 'success', user: [User] }]
 
       } catch (e) { return [{ ok: false, message: e.message, data: e.name }] }
     })

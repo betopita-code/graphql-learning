@@ -10,13 +10,11 @@ import 'dotenv/config'
 
 const app = express()
 
-app.use(checkToken) // Middleware for validate tokens
+app.use(checkToken)
 server.applyMiddleware({ app, path: '/graphql' })
 
-// Create webSocketServer
 const ws = createServer(app)
 
-// Configure params for mongoConnection
 const options = { 
   autoReconnect:true,
   
@@ -36,21 +34,11 @@ const options = {
 }
 mongo.connect(process.env.URI, options).then(() => {
 
-  // If connected, then start server
-
   ws.listen(process.env.PORT, () => {
     console.log('Server on port', process.env.PORT)
-    console.log('Mongo on port: ', process.env.DB_PORT)
+    console.log('MongoDB on port: ', process.env.DB_PORT)
   
-    // Set up the WebSocket for handling GraphQL subscriptions
-    new SubscriptionServer({
-      execute,
-      subscribe,
-      schema
-    }, {
-      server: ws,
-      path: '/subscriptions',
-    })
+    new SubscriptionServer({ execute, subscribe, schema }, { server: ws, path: '/subscriptions' })
   })
 
 }).catch(err => {
