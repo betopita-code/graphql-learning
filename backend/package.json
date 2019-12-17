@@ -6,17 +6,9 @@
   "scripts": {
     "start": "nodemon ./src/config --exec babel-node .e js"
   },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/betopita-code/graphql-learning.git"
-  },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/betopita-code/graphql-learning/issues"
-  },
-  "homepage": "https://github.com/betopita-code/graphql-learning#readme",
   "devDependencies": {
     "nodemon": "^1.19.4"
   },
