@@ -33,7 +33,7 @@
     "jsonwebtoken": "^9.0.0",
     "merge-graphql-schemas": "^1.5.8",
     "mkdirp": "^0.5.1",
-    "mongoose": "^5.4.2",
+    "mongoose": "^6.13.12",
     "mongoose-unique-validator": "^2.0.2",
     "promises-all": "^1.0.0",
     "shortid": "^2.2.14",
